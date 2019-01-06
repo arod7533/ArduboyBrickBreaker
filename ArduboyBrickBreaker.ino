@@ -1,5 +1,5 @@
 /*
-BrickBreaker 
+BrickBreaker
 January 5, 2019
 Copyright (C) 2019 Tony Rodriguez
 All rights reserved.
@@ -15,9 +15,14 @@ Arduboy2 arduboy;
 int gamestate = 0;
 int ballx = 62;
 int bally = 0;
-int ballsize = 4;
+int ballsize = 3;
 int ballright = 1;
 int balldown = 1;
+int ballRadius = 1;
+int paddleWidth = 10;
+int paddleHeight = 2;
+int paddleX = 61;
+int paddleY = 55;
 
 
 // This function runs once in your game.
@@ -56,11 +61,9 @@ void loop() {
 		}
 		break;
 	case 1:
-		//Gameplay screen
-		arduboy.setCursor(0, 0);
-		arduboy.print("Gameplay");
+		//Fill circle for the ball
+		arduboy.fillRoundRect(ballx, bally, ballsize, ballsize, ballRadius, WHITE);
 
-		arduboy.drawRect(ballx, bally, ballsize, ballsize, WHITE);
 		//Move the ball right
 		if (ballright == 1) {
 			ballx = ballx + 1;
@@ -74,8 +77,38 @@ void loop() {
 			ballright = 1;
 		}
 		//Reflect the ball off of the right side of the screen
-		if (ballx == 127) {
+		if (ballx + ballsize == 127) {
 			ballright = -1;
+		}
+		//Move the ball down
+		if (balldown == 1) {
+			bally = bally + 1;
+		}
+		//Move the ball up
+		if (balldown == -1) {
+			bally = bally - 1;
+		}
+		//Reflect the ball off of the top of the screen
+		if (bally == 0) {
+			balldown = 1;
+		}
+		//Reflect the ball off of the bottom of the screen
+		if (bally + ballsize == 63) {
+			balldown = -1;
+		}
+		//Fill the rectangle for the paddle
+		arduboy.fillRect(paddleX, paddleY, paddleWidth, paddleHeight, WHITE);
+
+		//Paddle Movement
+		if (arduboy.pressed(LEFT_BUTTON) && paddleX > 0) {
+			paddleX = paddleX - 2;
+		}
+		if (arduboy.pressed(RIGHT_BUTTON) && paddleX < 117) {
+			paddleX = paddleX + 2;
+		}
+		//Paddle and ball collision
+		if (bally + ballsize == paddleY && paddleX < ballx + ballsize && paddleX + paddleWidth > ballx) {
+			balldown = -1;
 		}
 
 		//Change the gamestate

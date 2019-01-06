@@ -17,16 +17,16 @@ ArduboyTones sound(arduboy.audio.enabled);
 
 //Variables needed for gameplay
 int gamestate = 0;
-int ballx = 62;
-int bally = 0;
+float ballx = 62;
+float bally = 0;
 int ballsize = 4;
 int ballright = 1;
 int balldown = 1;
-int ballSpeed = 1;
+float ballSpeed = 1.5;
 int ballRadius = 1;
 int paddleWidth = 20;
 int paddleHeight = 3;
-int paddleX = 64 - (paddleWidth/2);
+int paddleX = 64 - (paddleWidth / 2);
 int paddleY = 55;
 int paddleRadius = 1;
 
@@ -79,12 +79,12 @@ void loop() {
 			ballx = ballx - ballSpeed;
 		}
 		//Reflect the ball off of the left side of the screen
-		if (ballx == 0) {
+		if (ballx <= 0) {
 			ballright = 1;
 			sound.tone(600, 50);
 		}
 		//Reflect the ball off of the right side of the screen
-		if (ballx + ballsize == 127) {
+		if (ballx + ballsize >= 127) {
 			ballright = -1;
 			sound.tone(600, 50);
 		}
@@ -97,26 +97,26 @@ void loop() {
 			bally = bally - ballSpeed;
 		}
 		//Reflect the ball off of the top of the screen
-		if (bally == 0) {
+		if (bally <= 0) {
 			balldown = 1;
 			sound.tone(500, 50);
 		}
 		//Reflect the ball off of the bottom of the screen
-		if (bally + ballsize == 63) {
+		if (bally + ballsize >= 64) {
 			balldown = -1;
 		}
 		//Fill the rectangle for the paddle
 		arduboy.fillRoundRect(paddleX, paddleY, paddleWidth, paddleHeight, paddleRadius, WHITE);
 
 		//Paddle Movement
-		if (arduboy.pressed(LEFT_BUTTON) && (paddleX - paddleRadius*2) >= 0 ) {
+		if (arduboy.pressed(LEFT_BUTTON) && (paddleX - paddleRadius * 2) >= 0) {
 			paddleX = paddleX - 2;
 		}
-		if (arduboy.pressed(RIGHT_BUTTON) && (paddleX + paddleWidth + paddleRadius*2) <= 128) {
+		if (arduboy.pressed(RIGHT_BUTTON) && (paddleX + paddleWidth + paddleRadius * 2) <= 128) {
 			paddleX = paddleX + 2;
 		}
 		//Paddle and ball collision
-		if (bally + ballsize == paddleY && (paddleX - paddleRadius*2) < ballx + ballsize && (paddleX + paddleWidth + paddleRadius*2) > ballx) {
+		if (bally + ballsize >= paddleY && (paddleX - paddleRadius * 2) < ballx + ballsize && (paddleX + paddleWidth + paddleRadius * 2) > ballx) {
 			balldown = -1;
 			sound.tone(900, 50);
 		}

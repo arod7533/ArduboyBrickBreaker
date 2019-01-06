@@ -5,24 +5,30 @@ Copyright (C) 2019 Tony Rodriguez
 All rights reserved.
 */
 
+#include <ArduboyTonesPitches.h>
+#include <ArduboyTones.h>
 #include <Arduboy2.h>
 
 // make an instance of arduboy used for many functions
 Arduboy2 arduboy;
+ArduboyTones sound(arduboy.audio.enabled);
+
 
 
 //Variables needed for gameplay
 int gamestate = 0;
 int ballx = 62;
 int bally = 0;
-int ballsize = 3;
+int ballsize = 4;
 int ballright = 1;
 int balldown = 1;
+int ballSpeed = 1;
 int ballRadius = 1;
-int paddleWidth = 10;
-int paddleHeight = 2;
-int paddleX = 61;
+int paddleWidth = 20;
+int paddleHeight = 3;
+int paddleX = 64 - (paddleWidth/2);
 int paddleY = 55;
+int paddleRadius = 1;
 
 
 // This function runs once in your game.
@@ -66,49 +72,53 @@ void loop() {
 
 		//Move the ball right
 		if (ballright == 1) {
-			ballx = ballx + 1;
+			ballx = ballx + ballSpeed;
 		}
 		//Move the ball left
 		if (ballright == -1) {
-			ballx = ballx - 1;
+			ballx = ballx - ballSpeed;
 		}
 		//Reflect the ball off of the left side of the screen
 		if (ballx == 0) {
 			ballright = 1;
+			sound.tone(600, 50);
 		}
 		//Reflect the ball off of the right side of the screen
 		if (ballx + ballsize == 127) {
 			ballright = -1;
+			sound.tone(600, 50);
 		}
 		//Move the ball down
 		if (balldown == 1) {
-			bally = bally + 1;
+			bally = bally + ballSpeed;
 		}
 		//Move the ball up
 		if (balldown == -1) {
-			bally = bally - 1;
+			bally = bally - ballSpeed;
 		}
 		//Reflect the ball off of the top of the screen
 		if (bally == 0) {
 			balldown = 1;
+			sound.tone(500, 50);
 		}
 		//Reflect the ball off of the bottom of the screen
 		if (bally + ballsize == 63) {
 			balldown = -1;
 		}
 		//Fill the rectangle for the paddle
-		arduboy.fillRect(paddleX, paddleY, paddleWidth, paddleHeight, WHITE);
+		arduboy.fillRoundRect(paddleX, paddleY, paddleWidth, paddleHeight, paddleRadius, WHITE);
 
 		//Paddle Movement
-		if (arduboy.pressed(LEFT_BUTTON) && paddleX > 0) {
+		if (arduboy.pressed(LEFT_BUTTON) && (paddleX - paddleRadius*2) >= 0 ) {
 			paddleX = paddleX - 2;
 		}
-		if (arduboy.pressed(RIGHT_BUTTON) && paddleX < 117) {
+		if (arduboy.pressed(RIGHT_BUTTON) && (paddleX + paddleWidth + paddleRadius*2) <= 128) {
 			paddleX = paddleX + 2;
 		}
 		//Paddle and ball collision
-		if (bally + ballsize == paddleY && paddleX < ballx + ballsize && paddleX + paddleWidth > ballx) {
+		if (bally + ballsize == paddleY && (paddleX - paddleRadius*2) < ballx + ballsize && (paddleX + paddleWidth + paddleRadius*2) > ballx) {
 			balldown = -1;
+			sound.tone(900, 50);
 		}
 
 		//Change the gamestate
